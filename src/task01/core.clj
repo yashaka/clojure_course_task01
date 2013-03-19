@@ -4,26 +4,13 @@
 
 
 (defn get-links []
-" 1) Find all elements containing {:class \"r\"}.
-
-Example:
-[:h3 {:class \"r\"} [:a {:shape \"rect\", :class \"l\",
-                         :href \"https://github.com/clojure/clojure\",
-                         :onmousedown \"return rwt(this,'','','','4','AFQjCNFlSngH8Q4cB8TMqb710dD6ZkDSJg','','0CFYQFjAD','','',event)\"}
-                     [:em {} \"clojure\"] \"/\" [:em {} \"clojure\"] \" · GitHub\"]]
-
-   2) Extract href from the element :a.
-
-The link from the example above is 'https://github.com/clojure/clojure'.
-
-  3) Return vector of all 10 links.
-
-Example: ['https://github.com/clojure/clojure', 'http://clojure.com/', . . .]
-"
-  (let [data (parse "clojure_google.html")]
-    nil))
+  (map #(((nth % 2) 1) :href)            ;locating h3/a/href inside coll with all h3 with hrefs
+       (filter coll? ((fn smart-flat [x] ;filtering the output of the smart-flat fn applied to the parsed html
+                                         ;  smart-flat smartly flattens everything passed except h3 with {:class "r"}
+                        (if (and (coll? x) (not= (second x) {:class "r"})) 
+                          (mapcat smart-flat x)
+                          [x]))
+                      (parse "clojure_google.html")))))
 
 (defn -main []
   (println (str "Found " (count (get-links)) " links!")))
-
-
